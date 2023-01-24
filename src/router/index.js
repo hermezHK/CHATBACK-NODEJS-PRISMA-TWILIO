@@ -1,6 +1,6 @@
 import { UserRouter } from "../components";
 
-const routes = [["/user", UserRouter]];
+const routes = [["user", UserRouter]];
 
 const router = (app) => {
   routes.forEach(([path, controller]) =>
