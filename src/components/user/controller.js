@@ -1,14 +1,8 @@
 import prisma from "../../datasource";
 import Pusher from "pusher";
-import { sendSMS } from "../../services";
+import { sendSMS, pusher } from "../../services";
+import { Prisma } from "@prisma/client";
 
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID,
-  key: process.env.PUSHER_KEY,
-  secret: process.env.PUSHER_SECRET,
-  cluster: "us2",
-  useTLS: true,
-});
 
 const findOne = async (email) => {
   try {
@@ -20,7 +14,9 @@ const findOne = async (email) => {
 
 export const findAll = async (req, res) => {
   try {
-    const users = prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      where: {id: {not : Number(req.params.id) } },
+    });
     res.json({
       ok: true,
       data: users,
@@ -52,7 +48,7 @@ export const store = async (req, res) => {
     body.code_confirm = String(code);
 
     const user = await prisma.user.create({ data: { ...body } });
-    pusher.trigger("my-channel", "my-event", { message: "Hola Hermez" });
+    pusher.trigger("my-chat", "my-list-contacts", { message: "Hola Hermez" });
     res.status(201).json({
       ok: true,
       data: user,
@@ -64,3 +60,32 @@ export const store = async (req, res) => {
     });
   }
 };
+
+export const validateCodeConfirm = async (req, res) =>{
+  const { code_confirm, email } = req.body
+
+  const user = await prisma.user.findFirst({
+    where: {
+      code_confirm,
+       email,
+    },
+  });
+
+  if(!user){
+    return res.json({
+      ok: false,
+      data: "El código no es válido",
+    }); //
+  }
+
+  const updateUser = await prisma.user.update({
+    where: { id: user.id },
+    data: { is_confirmed: true },
+  });
+
+  res.json({
+    ok: true,
+    data: updateUser,
+  });
+};
+

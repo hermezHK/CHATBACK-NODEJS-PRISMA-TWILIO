@@ -15,6 +15,7 @@ model User {
   profile_url  String?
   phone_number String?   @db.VarChar(12)
   code_confirm String?   @db.VarChar(4)
+  is_confirmed Boolean?  @default(false)
   created_at   DateTime  @default(now())
   updated_at   DateTime  @updatedAt
   Message      Message[]
@@ -26,6 +27,7 @@ model Message {
   id         Int      @id @default(autoincrement())
   message    String
   user_id    Int
+  send_id    Int
   User       User     @relation(fields: [user_id], references: [id])
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
