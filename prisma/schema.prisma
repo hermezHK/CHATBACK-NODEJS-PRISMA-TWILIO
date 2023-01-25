@@ -7,27 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name String ?
-  password String?
-  profile_url String?
-  phone_number String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  Message Message[]
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  name         String?
+  password     String?
+  profile_url  String?
+  phone_number String?   @db.VarChar(12)
+  code_confirm String?   @db.VarChar(4)
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  Message      Message[]
 
   @@map("users")
-
 }
 
-model  Message {
-  id  Int    @id @default(autoincrement())
-  message  String 
-  user_id Int
-  User User @relation(fields: [user_id], references: [id])
+model Message {
+  id         Int      @id @default(autoincrement())
+  message    String
+  user_id    Int
+  User       User     @relation(fields: [user_id], references: [id])
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
