@@ -5,9 +5,9 @@ import { sendSMS } from "../../services";
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID,
   key: process.env.PUSHER_KEY,
-  secret: process.env.TZ_SECRET,
+  secret: process.env.PUSHER_SECRET,
   cluster: "us2",
-  useTLS: true
+  useTLS: true,
 });
 
 const findOne = async (email) => {
@@ -48,9 +48,11 @@ export const store = async (req, res) => {
 
     body.profile_url = `https://avatars.dicebear.com/api/avataaars/${body.name}.svg`;
 
+    const { code } = await sendSMS(body.name, body.phone_number);
+    body.code_confirm = String(code);
+
     const user = await prisma.user.create({ data: { ...body } });
-    pusher.trigger("my-channel", "my-event", 
-    { message: "Hola Hermez"});
+    pusher.trigger("my-channel", "my-event", { message: "Hola Hermez" });
     res.status(201).json({
       ok: true,
       data: user,
