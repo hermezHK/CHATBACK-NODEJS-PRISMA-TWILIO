@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { findAll, store } from "./controller";
+import { findAll, store, validateCodeConfirm } from "./controller";
 
 const userRouter = Router();
 
-userRouter.get("/", findAll);
+userRouter.get("/:id", findAll);
 userRouter.post("/", store);
+userRouter.put("/validate", validateCodeConfirm)
 
 export default userRouter;
